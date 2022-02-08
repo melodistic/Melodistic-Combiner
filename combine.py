@@ -1,10 +1,7 @@
+from math import ceil
 from pydub import AudioSegment
-
-part1 = AudioSegment.from_wav("song/part1.wav")
-part2 = AudioSegment.from_wav("song/part2.wav")
-part3 = AudioSegment.from_wav("song/part3.wav")
-part4 = AudioSegment.from_wav("song/part4.wav")
-part5 = AudioSegment.from_wav("song/part5.wav")
+import os
+import random
 
 def detect_leading_silence(sound, chunk_size=10):
     silence_threshold = sound.dBFS * 1.5
@@ -25,23 +22,55 @@ def preprocessing(audio):
     duration = len(audio)
     return audio[start_trim:duration-end_trim]
 
+def trim_audio(audio,time):
+    audio = audio[:time * 1000]
+    return audio
+
 def postprocessing(audio, time):
     five_second = 5 * 1000
-    audio = audio[:time * 1000]
+    audio = trim_audio(audio,time)
     audio = match_target_amplitude(audio, -20.0)
     audio = audio.fade_in(five_second).fade_out(five_second)
-    audio.export("song/combined_"+str(time)+"_secs.wav", format="wav")
+    return audio
 
 def combine(part1, part2):
-    combined = part1.fade_out(500) + part2.fade_in(500)
+    combined = part1[:-500] + part1[-500:].overlay(part2[:500]) + part2[500:]
     return combined
 
 def combine_all(audio):
-    combined = preprocessing(audio[0])
+    combined = audio[0]
     for part in audio[1:]:
-        combined = combine(combined, preprocessing(part))
+        combined = combine(combined, part)
     return combined
 
+def get_audio_length(audio):
+    return len(audio)
+
+def export(audio,filename):
+    audio.export("export/"+filename, format="wav")
+
 if __name__ == '__main__':
-    audio = combine_all([part1,part2,part3,part4,part5])
-    postprocessing(audio, 12 * 60)
+    program = [["slow", 120], ["fast", 6 * 60], ["slow", 120]]
+    over_all_time = 0
+    audio_list = []
+    for i in program:
+        mode = i[0]
+        time = i[1]
+        song_list = os.listdir("song/"+mode)
+        selected_song_path = random.choices(song_list, k=len(song_list))
+        selected_song = []
+        current_time = 0
+        for song in selected_song_path:
+            audio = AudioSegment.from_wav("song/"+mode+"/"+song)
+            audio = preprocessing(audio)
+            selected_song.append(audio)
+            current_time += get_audio_length(audio)
+            if current_time > (time * 1000 + 500):
+                break
+        combined = combine_all(selected_song)
+        audio = trim_audio(combined, time + 0.5)
+        audio_list.append(audio)
+        over_all_time += time
+    audio = combine_all(audio_list)
+    audio = postprocessing(audio, over_all_time)
+    export(audio, "combine.wav")
