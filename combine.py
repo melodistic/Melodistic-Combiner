@@ -1,3 +1,4 @@
+import json
 from math import ceil
 from pydub import AudioSegment
 import os
@@ -50,18 +51,21 @@ def export(audio,filename):
     audio.export("export/"+filename, format="wav")
 
 if __name__ == '__main__':
-    program = [["slow", 120], ["fast", 6 * 60], ["slow", 120]]
+    # Read program.json file
+    with open('programs/program.json') as f:
+        program = json.load(f)
     over_all_time = 0
     audio_list = []
-    for i in program:
-        mode = i[0]
-        time = i[1]
-        song_list = os.listdir("song/"+mode)
+    for i in program["sections"]:
+        mood = i["mood"]
+        type = i["type"]
+        time = i["duration"]
+        song_list = os.listdir("extract/"+mood)
         selected_song_path = random.choices(song_list, k=len(song_list))
         selected_song = []
         current_time = 0
         for song in selected_song_path:
-            audio = AudioSegment.from_wav("song/"+mode+"/"+song)
+            audio = AudioSegment.from_wav("extract/"+mood+"/"+song)
             audio = preprocessing(audio)
             selected_song.append(audio)
             current_time += get_audio_length(audio)
@@ -73,4 +77,4 @@ if __name__ == '__main__':
         over_all_time += time
     audio = combine_all(audio_list)
     audio = postprocessing(audio, over_all_time)
-    export(audio, "combine.wav")
+    export(audio, program["name"] + ".wav")
