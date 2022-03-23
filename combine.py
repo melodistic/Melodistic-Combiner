@@ -76,7 +76,6 @@ if __name__ == '__main__':
             if current_time > (time * 1000 + 500):
                 break
         selected_song.sort(key=lambda x: x[1],reverse=type=="COOLDOWN")
-        print(selected_song)
         selected_song = list(map(lambda x: x[0],selected_song))
         combined = combine_all(selected_song)
         audio = trim_audio(combined, time + 0.5)
