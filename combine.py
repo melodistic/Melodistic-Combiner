@@ -1,5 +1,5 @@
 import json
-from math import ceil
+import pandas as pd
 from pydub import AudioSegment
 import os
 import random
@@ -56,21 +56,28 @@ if __name__ == '__main__':
         program = json.load(f)
     over_all_time = 0
     audio_list = []
+    song_list = pd.read_csv('data.csv')
     for i in program["sections"]:
         mood = i["mood"]
         type = i["type"]
         time = i["duration"]
-        song_list = os.listdir("extract/"+mood)
-        selected_song_path = random.choices(song_list, k=len(song_list))
+        if type == "WARMUP" or type == "COOLDOWN":
+            song_by_mood = song_list[(song_list["mood"] == mood) & (song_list["bpm"] < 120)]
+        else:
+            song_by_mood = song_list[(song_list["mood"] == mood) & (song_list["bpm"] >= 120)]
+        song_order_list = random.choices(range(len(song_by_mood)), k=len(song_by_mood))
         selected_song = []
         current_time = 0
-        for song in selected_song_path:
-            audio = AudioSegment.from_wav("extract/"+mood+"/"+song)
+        for song in song_order_list:
+            audio = AudioSegment.from_wav("extract/"+mood+"/"+song_by_mood.iloc[song]["filename"])
             audio = preprocessing(audio)
-            selected_song.append(audio)
+            selected_song.append([audio,song_by_mood.iloc[song]["bpm"]])
             current_time += get_audio_length(audio)
             if current_time > (time * 1000 + 500):
                 break
+        selected_song.sort(key=lambda x: x[1],reverse=type=="COOLDOWN")
+        print(selected_song)
+        selected_song = list(map(lambda x: x[0],selected_song))
         combined = combine_all(selected_song)
         audio = trim_audio(combined, time + 0.5)
         audio_list.append(audio)
