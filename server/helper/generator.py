@@ -44,7 +44,7 @@ def get_audio_length(audio):
     return len(audio)
 
 def export(audio,filename):
-    audio.export("export/"+filename, format="wav")
+    audio.export("combine-result/"+filename, format="wav")
 
 def get_similarity(audio1, audio2):
     feature1 = audio1["features"]

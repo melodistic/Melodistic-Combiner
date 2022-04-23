@@ -1,8 +1,7 @@
 from flask import Flask
-from flask_cors import CORS,cross_origin
+from flask_cors import CORS
 from flask_restful import Api, reqparse
 from routes.routes import initialize_routes
-from service.data import Database
 
 app = Flask(__name__)
 CORS(app)
