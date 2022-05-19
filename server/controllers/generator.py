@@ -30,7 +30,7 @@ def generate(program):
     audio = combine_all(audio_list)
     audio = postprocessing(audio, over_all_time * 60 * 1000)
     filename = program["program_name"] + ".wav"
-    section_description = str(duration) + " mins exercise with " + str(len(program["sections"])) + " sections" 
+    section_description = str(over_all_time) + " mins exercise with " + str(len(program["sections"])) + " sections" 
     data = {
         "filename": filename,
         "program_name": program["program_name"],
