@@ -6,11 +6,13 @@ def generate(program):
     over_all_time = 0
     audio_list = []
     song_list = []
-    for i in program["sections"]:
-        mood = i["mood"]
-        type = i["type"]
-        time = i["duration"]
-        song_list = create_list_of_song(data, mood, type, int(time / 30 + 10))
+    for section in program["sections"]:
+        section_name = section["section_name"]
+        type = section["section_type"]
+        muslce_group = section["muscle_group"]
+        mood = section["mood"]
+        duration = section["duration"]
+        song_list = create_list_of_song(data, mood, type, int(duration / 2) + 10)
         selected_song = []
         current_time = 0
         for song in song_list:
@@ -19,14 +21,22 @@ def generate(program):
             audio = preprocessing(audio)
             selected_song.append(audio)
             current_time += get_audio_length(audio)
-            if current_time > (time * 1000 + 500):
+            if current_time > (duration * 60 * 1000 + 500):
                 break
         combined = combine_all(selected_song)
-        audio = trim_audio(combined, time + 0.5)
+        audio = trim_audio(combined, duration * 60 + 0.5)
         audio_list.append(audio)
-        over_all_time += time
+        over_all_time += duration
     audio = combine_all(audio_list)
     audio = postprocessing(audio, over_all_time)
-    filename = program["name"] + ".wav"
-    export(audio, program["name"] + ".wav")
+    filename = program["program_name"] + ".wav"
+    section_description = str(duration) + " mins exercise with " + str(len(program["sections"])) + " sections" 
+    data = {
+        "filename": filename,
+        "program_name": program["program_name"],
+        "description": section_description,
+        "program_image_url": program["program_image_url"]
+    }
+    export(audio, filename)
+    Database.save_data(data)
     return {"status": "success", "filename": filename, "url": f"http://20.24.147.227:5050/api/play/{filename}".replace(" ", "%20")}

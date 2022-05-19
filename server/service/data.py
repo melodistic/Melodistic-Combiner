@@ -8,3 +8,11 @@ class Database:
             self.data += json.load(open("data/"+i))
     def get_data(self):
         return self.data
+    def save_data(self, data):
+        all_data = []
+        with open("data.json", "r") as f:
+            all_data = json.load(f)
+        all_data.append(data)
+        with open("data.json", "w") as f:
+            json.dump(all_data, f)
+        
