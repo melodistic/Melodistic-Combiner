@@ -39,4 +39,4 @@ def generate(program):
     }
     export(audio, filename)
     Database().save_data(data)
-    return {"status": "success", "filename": filename, "url": f"http://20.24.147.227:5050/api/play/{filename}".replace(" ", "%20")}
+    return {"status": "success", "track": data, "url": f"http://20.24.147.227:5050/api/play/{filename}".replace(" ", "%20")}
