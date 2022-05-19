@@ -38,5 +38,5 @@ def generate(program):
         "program_image_url": program["program_image_url"]
     }
     export(audio, filename)
-    Database.save_data(data)
+    Database().save_data(data)
     return {"status": "success", "filename": filename, "url": f"http://20.24.147.227:5050/api/play/{filename}".replace(" ", "%20")}
