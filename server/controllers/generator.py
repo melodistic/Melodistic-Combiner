@@ -33,7 +33,17 @@ def generate(program):
     filename = program["program_name"] + ".wav"
     section_description = str(over_all_time) + " mins exercise with " + str(len(program["sections"])) + " sections"
     export(audio, filename)
-    cur.callproc("public.create_new_track", [program["program_name"], program["program_image_url"], filename, program["exercise_type"], program["sections"][0]["muscle_group"], section_description, over_all_time])
+    data = {
+        "track_name": program["program_name"],
+        "track_image_url": program["program_image"],
+        "track_path": f"http://20.24.147.227:5050/api/play/{filename}",
+        "exercise_type": program["exercise_type"],
+        "muscle_group": program["sections"][0]["muscle_group"], 
+        "description": section_description,
+        "duration": over_all_time
+    }
+    cur.execute("CALL create_new_track(%s,%s,%s,%s,%s,%s,%s)", [data["track_name"], data["track_image_url"], data["track_path"], data["exercise_type"], data["muscle_group"], data["description"], data["duration"]])
     cur.close()
+    conn.commit()
     conn.close()
     return {"status": "success", "track": data, "url": f"http://20.24.147.227:5050/api/play/{filename}".replace(" ", "%20")}
