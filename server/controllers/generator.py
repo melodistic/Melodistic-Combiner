@@ -18,8 +18,7 @@ def generate(program):
         selected_song = []
         current_time = 0
         for song in song_list:
-            song_name = song.split("/")[1].split(".")[0]
-            audio = AudioSegment.from_wav("song/"+mood+"/"+song_name+".wav")
+            audio = AudioSegment.from_wav(song[2])
             audio = preprocessing(audio)
             selected_song.append(audio)
             current_time += get_audio_length(audio)
