@@ -1,4 +1,5 @@
 import numpy as np
+import json
 
 def detect_leading_silence(sound, chunk_size=10):
     silence_threshold = sound.dBFS * 1.5
@@ -47,38 +48,33 @@ def export(audio,filename):
     audio.export("combine-result/"+filename, format="wav")
 
 def get_similarity(audio1, audio2):
-    feature1 = audio1["features"]
-    feature2 = audio2["features"]
+    feature1 = json.load(open(audio1[3], 'r'))
+    feature2 = json.load(open(audio2[3], 'r'))
     return np.dot(feature1, feature2) / (np.linalg.norm(feature1) * np.linalg.norm(feature2))
 
 def compare_two_audio(audio1, audio2):
     similarity = get_similarity(audio1, audio2)
     return similarity
 
-def find_most_similar_songs(data, current_song, mood, existed_songs, bpm_range = [0, 200]):
-    next_song_lists = np.random.choice(list(filter(lambda x: x["mood"] == mood,data)),size = 100)
+def find_most_similar_songs(data, current_song, existed_songs):
+    next_song_lists = np.random.randint(len(data),size = 100)
     max_similarities = 0
     max_song = None
     for next_song in next_song_lists:
-        if next_song["name"] not in existed_songs:
-            if current_song["name"] != next_song["name"] and next_song["mood"] == mood and next_song["bpm"] >= bpm_range[0] and next_song["bpm"] < bpm_range[1] :
-                similarity = compare_two_audio(current_song, next_song)
-                if similarity > max_similarities:
-                    max_similarities = similarity
-                    max_song = next_song
+        if data[next_song][2] not in existed_songs:
+            similarity = compare_two_audio(current_song, data[next_song])
+            if similarity > max_similarities:
+                max_similarities = similarity
+                max_song = data[next_song]
     return max_song
 
-def create_list_of_song(data, mood, mode, n = 60):
-    current_song = np.random.choice(list(filter(lambda x: x["mood"] == mood,data)),size = 1)[0]
-    song_list = [current_song["name"]]
+def create_list_of_song(data, n = 60):
+    current_song = data[np.random.randint(len(data))]
+    song_list = [current_song[2]]
     for _ in range(n):
-        if mode == "WARMUP" or mode == "COOLDOWN" or mode == "BREAK":
-            bpm_range = [0, 120]
-        else:
-            bpm_range = [120, 200]
-        next_song = find_most_similar_songs(data, current_song, mood, song_list,bpm_range)
+        next_song = find_most_similar_songs(data, current_song, song_list)
         if next_song is None:
             break
-        song_list.append(next_song["name"])
+        song_list.append(next_song[2])
         current_song = next_song
     return song_list

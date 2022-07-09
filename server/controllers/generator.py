@@ -1,23 +1,25 @@
 from service.data import Database
 from pydub import AudioSegment
 from helper.generator import create_list_of_song, preprocessing, trim_audio, combine_all, postprocessing, get_audio_length, export
+from psycopg2 import connect
 def generate(program):
-    data = Database().get_data()
+    conn = connect("host=20.24.147.227 dbname=melodistic user=melodistic password=melodistic-pwd")
+    cur = conn.cursor()
     over_all_time = 0
     audio_list = []
     song_list = []
     for section in program["sections"]:
-        section_name = section["section_name"]
         type = section["section_type"]
-        muslce_group = section["muscle_group"]
         mood = section["mood"]
         duration = section["duration"]
-        song_list = create_list_of_song(data, mood, type, int(duration / 2) + 10)
+        cur.execute("SELECT * FROM public.get_song_list(%s , %s)", [mood, type])
+        data = cur.fetchall()
+        song_list = create_list_of_song(data, int(duration / 2) + 10)
         selected_song = []
         current_time = 0
         for song in song_list:
             song_name = song.split("/")[1].split(".")[0]
-            audio = AudioSegment.from_wav("extract-data/"+mood+"/"+song_name+".wav")
+            audio = AudioSegment.from_wav("song/"+mood+"/"+song_name+".wav")
             audio = preprocessing(audio)
             selected_song.append(audio)
             current_time += get_audio_length(audio)
@@ -30,13 +32,9 @@ def generate(program):
     audio = combine_all(audio_list)
     audio = postprocessing(audio, over_all_time * 60 * 1000)
     filename = program["program_name"] + ".wav"
-    section_description = str(over_all_time) + " mins exercise with " + str(len(program["sections"])) + " sections" 
-    data = {
-        "filename": filename,
-        "program_name": program["program_name"],
-        "description": section_description,
-        "program_image_url": program["program_image_url"]
-    }
+    section_description = str(over_all_time) + " mins exercise with " + str(len(program["sections"])) + " sections"
     export(audio, filename)
-    Database().save_data(data)
+    cur.callproc("create_new_track", [program["program_name"], program["program_image_url"], filename, program["exercise_type"], section[0]["muscle_group"], section_description, over_all_time])
+    cur.close()
+    conn.close()
     return {"status": "success", "track": data, "url": f"http://20.24.147.227:5050/api/play/{filename}".replace(" ", "%20")}
