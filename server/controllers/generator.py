@@ -30,20 +30,20 @@ def generate(program):
         over_all_time += duration
     audio = combine_all(audio_list)
     audio = postprocessing(audio, over_all_time * 60 * 1000)
-    filename = program["program_name"] + ".wav"
     section_description = str(over_all_time) + " mins exercise with " + str(len(program["sections"])) + " sections"
-    export(audio, filename)
     data = {
         "track_name": program["program_name"],
         "track_image_url": program["program_image"],
-        "track_path": f"http://20.24.147.227:5050/api/play/{filename}",
+        "track_path": f"combine-result",
         "exercise_type": program["exercise_type"],
         "muscle_group": program["sections"][0]["muscle_group"], 
         "description": section_description,
         "duration": over_all_time
     }
     cur.execute("CALL create_new_track(%s,%s,%s,%s,%s,%s,%s)", [data["track_name"], data["track_image_url"], data["track_path"], data["exercise_type"], data["muscle_group"], data["description"], data["duration"]])
+    filename = cur.fetchone()[0]
     cur.close()
     conn.commit()
     conn.close()
+    export(audio, filename)
     return {"status": "success", "track": data, "url": f"http://20.24.147.227:5050/api/play/{filename}".replace(" ", "%20")}
