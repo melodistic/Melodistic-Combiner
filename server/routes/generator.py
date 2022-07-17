@@ -12,7 +12,7 @@ class Generator(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('program_name',type=str)
         parser.add_argument('track_image_ext',type=str)
-        parser.add_argument('exercise_type',type=str)
+        parser.add_argument('muscle_group',type=str)
         parser.add_argument('sections',type=list,location="json")
         program=parser.parse_args()
         return generate(program)

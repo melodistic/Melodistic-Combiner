@@ -36,12 +36,11 @@ def generate(program):
         "track_image_path": "uploads/program_images",
         "track_image_ext": program["track_image_ext"],
         "track_path": "combine-result",
-        "exercise_type": program["exercise_type"],
-        "muscle_group": program["sections"][0]["muscle_group"], 
+        "muscle_group": program["muscle_group"], 
         "description": section_description,
         "duration": over_all_time
     }
-    cur.execute("SELECT * FROM create_new_track(%s,%s,%s,%s,%s,%s,%s,%s)", [data["track_name"], data["track_image_path"], data["track_image_ext"], data["track_path"], data["exercise_type"], data["muscle_group"], data["description"], data["duration"]])
+    cur.execute("SELECT * FROM create_new_track(%s,%s,%s,%s,%s,%s,%s)", [data["track_name"], data["track_image_path"], data["track_image_ext"], data["track_path"], data["muscle_group"], data["description"], data["duration"]])
     track_id = cur.fetchone()[0]
     cur.close()
     conn.commit()
