@@ -33,17 +33,18 @@ def generate(program):
     section_description = str(over_all_time) + " mins exercise with " + str(len(program["sections"])) + " sections"
     data = {
         "track_name": program["program_name"],
-        "track_image_url": program["program_image"],
-        "track_path": f"combine-result",
+        "track_image_path": "uploads/program_images",
+        "track_image_ext": program["track_image_ext"],
+        "track_path": "combine-result",
         "exercise_type": program["exercise_type"],
         "muscle_group": program["sections"][0]["muscle_group"], 
         "description": section_description,
         "duration": over_all_time
     }
-    cur.execute("SELECT * FROM create_new_track(%s,%s,%s,%s,%s,%s,%s)", [data["track_name"], data["track_image_url"], data["track_path"], data["exercise_type"], data["muscle_group"], data["description"], data["duration"]])
-    filename = cur.fetchone()[0]
+    cur.execute("SELECT * FROM create_new_track(%s,%s,%s,%s,%s,%s,%s,%s)", [data["track_name"], data["track_image_path"], data["track_image_ext"], data["track_path"], data["exercise_type"], data["muscle_group"], data["description"], data["duration"]])
+    track_id = cur.fetchone()[0]
     cur.close()
     conn.commit()
     conn.close()
-    export(audio, filename)
-    return {"status": "success", "track": data, "url": f"https://melodistic.ggolfz.me/api/stream/{filename}".replace(" ", "%20")}
+    export(audio, track_id)
+    return {"status": "success", "track_id": track_id, "url": f"https://melodistic.ggolfz.me/api/stream/{track_id}".replace(" ", "%20")}
