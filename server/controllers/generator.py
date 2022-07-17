@@ -46,4 +46,4 @@ def generate(program):
     conn.commit()
     conn.close()
     export(audio, filename)
-    return {"status": "success", "track": data, "url": f"http://20.24.147.227:5050/api/play/{filename}".replace(" ", "%20")}
+    return {"status": "success", "track": data, "url": f"https://melodistic.ggolfz.me/api/stream/{filename}".replace(" ", "%20")}
