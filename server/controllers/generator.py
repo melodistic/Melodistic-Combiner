@@ -40,7 +40,7 @@ def generate(program):
         "description": section_description,
         "duration": over_all_time
     }
-    cur.execute("CALL create_new_track(%s,%s,%s,%s,%s,%s,%s)", [data["track_name"], data["track_image_url"], data["track_path"], data["exercise_type"], data["muscle_group"], data["description"], data["duration"]])
+    cur.execute("SELECT * FROM create_new_track(%s,%s,%s,%s,%s,%s,%s)", [data["track_name"], data["track_image_url"], data["track_path"], data["exercise_type"], data["muscle_group"], data["description"], data["duration"]])
     filename = cur.fetchone()[0]
     cur.close()
     conn.commit()
