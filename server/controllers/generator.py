@@ -1,4 +1,3 @@
-from service.data import Database
 from pydub import AudioSegment
 from helper.generator import create_list_of_song, preprocessing, trim_audio, combine_all, postprocessing, get_audio_length, export
 from psycopg2 import connect
@@ -18,7 +17,7 @@ def generate(program):
         selected_song = []
         current_time = 0
         for song in song_list:
-            audio = AudioSegment.from_wav(song)
+            audio = AudioSegment.from_wav("extract-data/"+str(song))
             audio = preprocessing(audio)
             selected_song.append(audio)
             current_time += get_audio_length(audio)
