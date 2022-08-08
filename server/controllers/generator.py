@@ -2,7 +2,7 @@ from pydub import AudioSegment
 from helper.generator import create_list_of_song, preprocessing, trim_audio, combine_all, postprocessing, get_audio_length, export
 from psycopg2 import connect
 def generate(program):
-    conn = connect("host=20.24.147.227 dbname=melodistic user=melodistic password=melodistic-pwd")
+    conn = connect("host=10.0.106.146 dbname=melodistic user=melodistic password=melodistic-pwd")
     cur = conn.cursor()
     over_all_time = 0
     audio_list = []
