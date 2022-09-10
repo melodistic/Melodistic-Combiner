@@ -43,4 +43,4 @@ def generate(program):
     conn.commit()
     conn.close()
     export(audio, track_id)
-    return {"status": "success", "track_id": track_id, "url": f"https://melodistic.me/api/stream/{track_id}".replace(" ", "%20")}
+    return {"status": "success", "track_id": track_id, "url": f"https://melodistic.me/api/stream/{track_id}"}
