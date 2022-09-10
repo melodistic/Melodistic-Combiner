@@ -48,8 +48,8 @@ def export(audio,filename):
     audio.export("combine-result/"+filename + ".wav", format="wav")
 
 def get_similarity(audio1, audio2):
-    feature1 = json.load(open("extract-data/"+str(audio1[3]), 'r'))
-    feature2 = json.load(open("extract-data/"+str(audio2[3]), 'r'))
+    feature1 = json.load(open(str(audio1[3]), 'r'))
+    feature2 = json.load(open(str(audio2[3]), 'r'))
     return np.dot(feature1, feature2) / (np.linalg.norm(feature1) * np.linalg.norm(feature2))
 
 def compare_two_audio(audio1, audio2):
