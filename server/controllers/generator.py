@@ -2,7 +2,7 @@ from pydub import AudioSegment
 from helper.generator import create_list_of_song, preprocessing, trim_audio, combine_all, postprocessing, get_audio_length, export
 from psycopg2 import connect
 def generate(program):
-    conn = connect("host=10.0.106.146 dbname=melodistic user=melodistic password=melodistic-pwd")
+    conn = connect("host=20.24.21.220 dbname=melodistic user=melodistic password=melodistic-pwd")
     cur = conn.cursor()
     over_all_time = 0
     audio_list = []
@@ -43,4 +43,4 @@ def generate(program):
     conn.commit()
     conn.close()
     export(audio, track_id)
-    return {"status": "success", "track_id": track_id, "url": f"https://melodistic.ggolfz.me/api/stream/{track_id}".replace(" ", "%20")}
+    return {"status": "success", "track_id": track_id, "url": f"https://melodistic.me/api/stream/{track_id}".replace(" ", "%20")}
