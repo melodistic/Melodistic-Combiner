@@ -11,7 +11,7 @@ def generate(program):
         type = section["section_type"]
         mood = section["mood"]
         duration = section["duration"]
-        bpm_mode = "Fast" if type == "Exercise" else "Slow"
+        bpm_mode = "Fast" if type == "EXERCISE" else "Slow"
         data = f"{mood}-{bpm_mode}"
         song_list = create_list_of_song(data, int(duration / 2) + 10)
         selected_song = []
