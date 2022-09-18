@@ -1,5 +1,8 @@
 import numpy as np
 import json
+import pandas as pd
+import random
+from sklearn.neighbors import NearestNeighbors
 
 def detect_leading_silence(sound, chunk_size=10):
     silence_threshold = sound.dBFS * 1.5
@@ -47,34 +50,27 @@ def get_audio_length(audio):
 def export(audio,filename):
     audio.export("combine-result/"+filename + ".wav", format="wav")
 
-def get_similarity(audio1, audio2):
-    feature1 = json.load(open(str(audio1[3]), 'r'))
-    feature2 = json.load(open(str(audio2[3]), 'r'))
-    return np.dot(feature1, feature2) / (np.linalg.norm(feature1) * np.linalg.norm(feature2))
-
-def compare_two_audio(audio1, audio2):
-    similarity = get_similarity(audio1, audio2)
-    return similarity
-
-def find_most_similar_songs(data, current_song, existed_songs):
-    next_song_lists = np.random.randint(len(data),size = 100)
-    max_similarities = 0
-    max_song = None
-    for next_song in next_song_lists:
-        if data[next_song][2] not in existed_songs:
-            similarity = compare_two_audio(current_song, data[next_song])
-            if similarity > max_similarities:
-                max_similarities = similarity
-                max_song = data[next_song]
-    return max_song
-
 def create_list_of_song(data, n = 60):
-    current_song = data[np.random.randint(len(data))]
-    song_list = [current_song[2]]
-    for _ in range(n):
-        next_song = find_most_similar_songs(data, current_song, song_list)
-        if next_song is None:
-            break
-        song_list.append(next_song[2])
-        current_song = next_song
+    df = pd.read_csv(f"csv_features/{data}.csv")
+    x = df.drop(["music_name"],axis=1)
+    y = df["music_name"]
+    song_list = []
+    threshold = 0.1
+    start_index = random.randint(0,n)
+    start_song = np.array([x.loc[start_index]])
+    while len(song_list) < n:
+        nbrs = NearestNeighbors(n_neighbors=21, algorithm='auto', metric="cosine").fit(x)
+        dis, pos = nbrs.kneighbors(start_song)
+        drop_index = []
+        for i in range(len(dis[0])):
+            if dis[0][i] > threshold:
+                x = x.drop(drop_index, axis=0)
+                x.reset_index(drop=True, inplace=True)
+                y = y.drop(drop_index, axis=0)
+                y.reset_index(drop=True, inplace=True)
+                break
+            else:
+                song_list.append(y.loc[pos[0][i]])
+                start_song = np.array([x.loc[pos[0][i]]])
+                drop_index.append(pos[0][i])
     return song_list

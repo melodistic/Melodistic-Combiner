@@ -11,13 +11,13 @@ def generate(program):
         type = section["section_type"]
         mood = section["mood"]
         duration = section["duration"]
-        cur.execute("SELECT * FROM public.get_song_list(%s , %s)", [mood, type])
-        data = cur.fetchall()
+        bpm_mode = "Fast" if type == "Exercise" else "Slow"
+        data = f"{mood}-{bpm_mode}"
         song_list = create_list_of_song(data, int(duration / 2) + 10)
         selected_song = []
         current_time = 0
         for song in song_list:
-            audio = AudioSegment.from_wav(str(song))
+            audio = AudioSegment.from_wav(f"song/{mood}/{str(song)}.wav")
             audio = preprocessing(audio)
             selected_song.append(audio)
             current_time += get_audio_length(audio)
