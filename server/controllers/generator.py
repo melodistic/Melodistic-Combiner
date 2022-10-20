@@ -1,6 +1,7 @@
 from pydub import AudioSegment
 from helper.generator import create_list_of_song, preprocessing, trim_audio, combine_all, postprocessing, get_audio_length, export
 from psycopg2 import connect
+
 def generate(program):
     conn = connect("host=20.24.21.220 dbname=melodistic user=melodistic password=melodistic-pwd")
     cur = conn.cursor()
@@ -13,7 +14,7 @@ def generate(program):
         duration = section["duration"]
         bpm_mode = "Fast" if type == "EXERCISE" else "Slow"
         data = f"{mood}-{bpm_mode}"
-        song_list = create_list_of_song(data, int(duration / 2) + 10)
+        song_list = create_list_of_song(data, int(duration / 2) + 50)
         selected_song = []
         current_time = 0
         for song in song_list:
