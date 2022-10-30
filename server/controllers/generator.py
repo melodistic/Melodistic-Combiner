@@ -14,7 +14,7 @@ def generate(program):
         mood = section["mood"]
         duration = section["duration"]
         music_ids = section["music_ids"]
-        cur.execute("SELECT * FROM get_music_info(%s)", ["'{" + ','.join(music_ids) + "'} :: uuid[]"])
+        cur.execute("SELECT * FROM get_music_info(%s :: uuid[])", ["{" + ','.join(music_ids) + "}"])
         included_music_info = cur.fetchall()
         included_music_data = []
         for music_info in included_music_info:
