@@ -1,7 +1,8 @@
 from pydub import AudioSegment
 from helper.generator import create_list_of_song, preprocessing, trim_audio, combine_all, postprocessing, get_audio_length, export
 from psycopg2 import connect
-
+import json
+import pandas as pd
 def generate(program):
     conn = connect("host=20.24.21.220 dbname=melodistic user=melodistic password=melodistic-pwd")
     cur = conn.cursor()
@@ -12,13 +13,24 @@ def generate(program):
         type = section["section_type"]
         mood = section["mood"]
         duration = section["duration"]
+        music_ids = section["music_ids"]
+        cur.execute("SELECT * FROM get_music_info(%s)", ["'{" + ','.join(music_ids) + "'} :: uuid[]"])
+        included_music_info = cur.fetchall()
+        included_music_data = []
+        for music_info in included_music_info:
+            feature_path = music_info[3]
+            song_path = music_info[2]
+            with open(feature_path) as f:
+                feature = json.load(f)
+                included_music_data.append([song_path, *feature])
+        included_music_df = pd.DataFrame(included_music_data, columns=["music_path", *["feature_"+str(i) for i in range(1280)]])
         bpm_mode = "Fast" if type == "EXERCISE" else "Slow"
         data = f"{mood}-{bpm_mode}"
-        song_list = create_list_of_song(data, int(duration / 2) + 50)
+        song_list = create_list_of_song(data, included_music_df, int(duration / 2) + 10)
         selected_song = []
         current_time = 0
         for song in song_list:
-            audio = AudioSegment.from_wav(f"song/{mood}/{str(song)}.wav")
+            audio = AudioSegment.from_wav(song)
             audio = preprocessing(audio)
             selected_song.append(audio)
             current_time += get_audio_length(audio)

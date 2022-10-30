@@ -50,13 +50,17 @@ def get_audio_length(audio):
 def export(audio,filename):
     audio.export("combine-result/"+filename + ".wav", format="wav")
 
-def create_list_of_song(data, n = 60):
+def create_list_of_song(data, included_music_df, n = 60):
     df = pd.read_csv(f"csv_features/{data}.csv")
-    x = df.drop(["music_name"],axis=1)
-    y = df["music_name"]
+    df = included_music_df.append(df, ignore_index=True)
+    x = df.drop(["music_path"],axis=1)
+    y = df["music_path"]
     song_list = []
     threshold = 0.1
-    start_index = random.randint(0,n)
+    if len(included_music_df) > 0:
+        start_index = random.randint(0,len(included_music_df))
+    else:
+        start_index = random.randint(0,len(df))
     start_song = np.array([x.loc[start_index]])
     while len(song_list) < n:
         nbrs = NearestNeighbors(n_neighbors=21, algorithm='auto', metric="cosine").fit(x.values)
