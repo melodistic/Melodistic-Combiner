@@ -1,6 +1,4 @@
+extract
+export
+*/__pycache__/
 .DS_Store
-song/*.wav
-*.wav
-*/*.wav
-*/*/*.wav
-programs
