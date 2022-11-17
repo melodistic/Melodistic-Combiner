@@ -26,7 +26,7 @@ def generate(program):
         included_music_df = pd.DataFrame(included_music_data, columns=["music_path", *["feature_"+str(i) for i in range(1280)]])
         bpm_mode = "Fast" if type == "EXERCISE" else "Slow"
         data = f"{mood}-{bpm_mode}"
-        song_list = create_list_of_song(data, included_music_df, int(duration / 2) + 10)
+        song_list = create_list_of_song(data, included_music_df, 2 * duration + 30)
         selected_song = []
         current_time = 0
         for song in song_list:

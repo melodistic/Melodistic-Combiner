@@ -65,7 +65,6 @@ def create_list_of_song(data, included_music_df, n = 60):
     while len(song_list) < n:
         nbrs = NearestNeighbors(n_neighbors=21, algorithm='auto', metric="cosine").fit(x.values)
         dis, pos = nbrs.kneighbors(start_song)
-        drop_index = []
         for i in range(len(dis[0])):
             if dis[0][i] > threshold:
                 break
