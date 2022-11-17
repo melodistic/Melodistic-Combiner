@@ -3,8 +3,14 @@ from helper.generator import create_list_of_song, preprocessing, trim_audio, com
 from psycopg2 import connect
 import json
 import pandas as pd
+import os
 def generate(program):
-    conn = connect("host=20.24.21.220 dbname=melodistic user=melodistic password=melodistic-pwd")
+    db_host = os.getenv('DB_HOST')
+    db_name = os.getenv('DB_NAME')
+    db_user = os.getenv('DB_USER')
+    db_password = os.getenv('DB_PASSWORD')
+    db_url = f"host={db_host} dbname={db_name} user={db_user} password={db_password}"
+    conn = connect(db_url)
     cur = conn.cursor()
     over_all_time = 0
     audio_list = []
