@@ -35,7 +35,7 @@ def postprocessing(audio, time):
     return audio
 
 def combine(part1, part2):
-    combined = part1[:-500] + part1[-500:].overlay(part2[:500]) + part2[500:]
+    combined = part1 + part2
     return combined
 
 def combine_all(audio):
@@ -56,7 +56,7 @@ def create_list_of_song(data, included_music_df, n = 60):
     x = df.drop(["music_path"],axis=1)
     y = df["music_path"]
     song_list = []
-    threshold = 0.1
+    threshold = 0.2
     if len(included_music_df) > 0:
         start_index = random.randint(0,len(included_music_df))
     else:
