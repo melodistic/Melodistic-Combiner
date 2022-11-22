@@ -47,7 +47,7 @@ def generate(program):
         audio_list.append(audio)
         over_all_time += duration
     audio = combine_all(audio_list)
-    audio = postprocessing(audio, over_all_time * 60 * 1000)
+    audio = postprocessing(audio, over_all_time * 60)
     section_description = str(over_all_time) + " mins exercise with " + str(len(program["sections"])) + " sections"
     data = {
         "track_name": program["program_name"],
