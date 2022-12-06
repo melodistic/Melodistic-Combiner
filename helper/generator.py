@@ -51,7 +51,7 @@ def export(audio,filename):
     audio.export("combine-result/"+filename + ".wav", format="wav")
 
 def create_list_of_song(data, included_music_df, n = 60):
-    df = pd.read_csv(f"csv_features/{data}.csv")
+    df = pd.read_csv(f"features/csv_features/{data}.csv")
     df = included_music_df.append(df, ignore_index=True)
     x = df.drop(["music_path"],axis=1)
     y = df["music_path"]
