@@ -63,7 +63,7 @@ def create_list_of_song(data, included_music_df, n = 60):
         start_index = random.randint(0,len(df))
     start_song = np.array([x.loc[start_index]])
     while len(song_list) < n:
-        nbrs = NearestNeighbors(n_neighbors=21, algorithm='auto', metric="cosine").fit(x.values)
+        nbrs = NearestNeighbors(n_neighbors=20, algorithm='auto', metric="cosine").fit(x.values)
         dis, pos = nbrs.kneighbors(start_song)
         for i in range(len(dis[0])):
             if dis[0][i] > threshold:
